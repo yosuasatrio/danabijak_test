@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 16 Nov 2022 pada 23.33
+-- Waktu pembuatan: 21 Nov 2022 pada 10.24
 -- Versi server: 10.4.25-MariaDB
 -- Versi PHP: 7.4.30
 
@@ -55,6 +55,14 @@ CREATE TABLE `merchant` (
   `Created_by` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data untuk tabel `merchant`
+--
+
+INSERT INTO `merchant` (`Merchant_ID`, `Merchant_name`, `Merchant_address`, `Created_at`, `Created_by`) VALUES
+(2, 'Testing Merchant', 'Taman Raya', '2022-11-21 08:02:38', 1),
+(3, 'Testing Merchant 2', 'Taman Raya', '2022-11-21 08:27:13', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -93,6 +101,15 @@ CREATE TABLE `transaction` (
   `Created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `Created_by` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `transaction`
+--
+
+INSERT INTO `transaction` (`Transaction_ID`, `Company_id`, `Description`, `Purpose`, `Merchant_id`, `Amount`, `Created_at`, `Created_by`) VALUES
+(1, 1, 'Urgent Transaction', 'Internal', 2, 150000, '2022-11-21 08:47:29', '1'),
+(2, 1, 'Urgent Transaction 2', 'Internal', 3, 16000, '2022-11-21 08:47:22', '1'),
+(3, 1, 'Urgent Transaction 2', 'Internal', 3, 160000, '2022-11-21 08:47:25', '1');
 
 --
 -- Indexes for dumped tables
@@ -136,7 +153,7 @@ ALTER TABLE `account`
 -- AUTO_INCREMENT untuk tabel `merchant`
 --
 ALTER TABLE `merchant`
-  MODIFY `Merchant_ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `Merchant_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT untuk tabel `payment`
@@ -148,7 +165,7 @@ ALTER TABLE `payment`
 -- AUTO_INCREMENT untuk tabel `transaction`
 --
 ALTER TABLE `transaction`
-  MODIFY `Transaction_ID` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `Transaction_ID` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
