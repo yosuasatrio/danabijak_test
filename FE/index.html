@@ -1,255 +1,881 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <!-- CSS only -->
-        <link href="https://cdn.usebootstrap.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/fontawesome.min.css" rel="stylesheet">
-        <style>
-            #overlay {
-                position: fixed;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: rgba(0,0,0,0.6);
-            }
-        </style>
-        <title>Danabijak Test Application</title> 
-    </head>
-    <body>
-        <div id="app">
-            <div class="container-fluid">
-                <div class="row bg-dark">
-                    <div class="col-lg-12">
-                        <p class="text-center text-light display-4 pt-2" style="font-size:25px;">DanaBijak Test Application</p>
-                    </div>
-                </div>
-            </div>
-            <div class="container">
-                <div class="row mt-3">
-                    <div class="col-lg-6">
-                        <h3 class="text-info">Account</h3>
-                    </div>
-                    <div class="col-lg-6">
-                        <button class="btn btn-info" style="float:right;" @click="showAddModal=true">
-                            Add New Account
-                        </button>
-                    </div>
-                </div>
-                <hr class="bg-info">
-                <div class="alert alert-danger" v-if="errorMsg">
-                    {{ errorMsg }}
-                </div>
-                <div class="alert alert-success" v-if="successMsg">
-                    {{ successMsg }}
-                </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <table class="table table-bordered table-striped">
-                            <thead>
-                                <tr class="text-center bg-info text-light">
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Number</th>
-                                    <th>Balance</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="text-center" v-for="accounts in account">
-                                    <td>{{accounts.id}}</td>
-                                    <td>{{accounts.name}}</td>
-                                    <td>{{accounts.number}}</td>
-                                    <td>{{accounts.balance}}</td>
-                                    <td>
-                                        <a href="#" class="btn btn-warning" @click="showEditModal=true; selectAccount(accounts);"> Edit </a>
-                                        <a href="#" class="btn btn-danger" @click="showDeleteModal=true; selectAccount(accounts);"> Delete </a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Add modal -->
-            <div id="overlay" v-if="showAddModal">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="model-header">
-                            <h5 class="modal-title" style="padding-left:10px; padding-right:10px;"> Add New Account
-                                <button type="button" class="close" @click="showAddModal=false">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </h5>
-                        </div>
-                        <div class="modal-body p-4">
-                            <form action="#" method="post">
-                                <div class="form-group">
-                                    <input type="text" name="name" class="form-control form-control-lg" placeholder="Add Name" v-model="newAccount.name">
-                                </div>
-                                <div class="form-group">
-                                    <input type="text" name="number" class="form-control form-control-lg" placeholder="Add Number" v-model="newAccount.number">
-                                </div>
-                                <div class="form-group">
-                                    <input type="text" name="balance" class="form-control form-control-lg" placeholder="Add Balance" v-model="newAccount.balance">
-                                </div>
-                                <div class="form-group">
-                                    <button class="btn btn-info btn-block btn-lg" @click="showAddModal=false; addAccount();">
-                                        Add Account
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Edit modal -->
-            <div id="overlay" v-if="showEditModal">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="model-header">
-                            <h5 class="modal-title" style="padding-left:10px; padding-right:10px;"> Edit Account
-                                <button type="button" class="close" @click="showEditModal=false">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </h5>
-                        </div>
-                        <div class="modal-body p-4">
-                            <form action="#" method="post">
-                                <div class="form-group">
-                                    <input type="text" name="name" class="form-control form-control-lg" placeholder="Add Name" v-model="currentAccount.name">
-                                </div>
-                                <div class="form-group">
-                                    <input type="text" name="number" class="form-control form-control-lg" placeholder="Add Number" v-model="currentAccount.number">
-                                </div>
-                                <div class="form-group">
-                                    <input type="text" name="balance" class="form-control form-control-lg" placeholder="Add Balance" v-model="currentAccount.balance">
-                                </div>
-                                <div class="form-group">
-                                    <button class="btn btn-info btn-block btn-lg" @click="showEditModal=false; updateAccount();">
-                                        Update Account
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-             <!-- Delete modal -->
-             <div id="overlay" v-if="showDeleteModal">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="model-header">
-                            <h5 class="modal-title" style="padding-left:10px; padding-right:10px;"> Delete Account
-                                <button type="button" class="close" @click="showDeleteModal=false">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </h5>
-                        </div>
-                        <div class="modal-body p-4">
-                            <h4>Are you sure want to delete data? </h4>
-                            <h5>You are deleting '{{ currentAccount.name }}'</h5>
-                            <hr>
-                            <button class="btn btn-danger btn-lg" @click="showDeleteModal=false; deleteAccount(); clearMsg();">Yes</button>
-                            <button class="btn btn-success btn-lg" @click="showDeleteModal=false">No</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <head>
+    <!-- CSS only -->
+    <link
+      href="https://cdn.usebootstrap.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/fontawesome.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      #overlay {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.6);
+      }
+    </style>
+    <title>Danabijak Test Application</title>
+  </head>
+  <body>
+    <div id="app">
+      <div class="container-fluid">
+        <div class="row bg-dark">
+          <div class="col-lg-9">
+            <p
+              class="text-center text-light display-4 pt-2"
+              style="font-size: 25px"
+            >
+              DanaBijak Test Application
+            </p>
+          </div>
+          <div class="col-lg-1" @click="menuActive='accountPage'">
+            <p
+              class="text-center text-light display-4 pt-2"
+              style="font-size: 25px"
+            >
+              Account
+            </p>
+          </div>
+          <div class="col-lg-1" @click="menuActive='paymentPage'">
+            <p
+              class="text-center text-light display-4 pt-2"
+              style="font-size: 25px"
+            >
+              Payment
+            </p>
+          </div>
+          <div class="col-lg-1" @click="menuActive='transactionPage'">
+            <p
+              class="text-center text-light display-4 pt-2"
+              style="font-size: 25px"
+            >
+              Transaction
+            </p>
+          </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.3/axios.min.js"></script>
-        <script>
-            var app = new Vue({
-            el: '#app',
-            data: {
-                errorMsg: "",
-                successMsg: "",
-                showAddModal: false,
-                showEditModal: false,
-                showDeleteModal: false,
-                account: [],
-                newAccount: {name: "", number: "", balance: ""},
-                currentAccount: {}
-            },
-            mounted: function(){
-                this.getAllAccount();
-            },
-            methods: {
-                getAllAccount() {
-                    axios.get("http://localhost/danabijak/be/Core.php?action=read").then(function(response) {
-                        if(response.data.error){
-                            app.errorMsg = response.data.message;
-                        }
-                        else {
-                            //app.successMsg = response.data.message;
-                            app.account = response.data.account;
-                        }
-                    })
-                },
-                addAccount() {
-                    var formData = app.toFormData(app.newAccount);
-                    axios.post("http://localhost/danabijak/be/Core.php?action=create", formData).then(function(response) {
-                        app.newAccount = {name: "", number: "", balance: ""};
-                        if(response.data.error){
-                            app.errorMsg = response.data.message;
-                        }
-                        else {
-                            app.successMsg = response.data.message;
-                            app.account = response.data.account;
-                            app.getAllAccount();
-                        }
-                    })
-                },
+      </div>
+      <div v-if="menuActive == 'accountPage'" class="container">
+        <div class="row mt-3">
+          <div class="col-lg-6">
+            <h3 class="text-info">Account</h3>
+          </div>
+          <div class="col-lg-6">
+            <button
+              class="btn btn-info"
+              style="float: right"
+              @click="showAddModal=true"
+            >
+              Add New Account
+            </button>
+          </div>
+        </div>
+        <hr class="bg-info" />
+        <div class="alert alert-danger" v-if="errorMsg">{{ errorMsg }}</div>
+        <div class="alert alert-success" v-if="successMsg">
+          {{ successMsg }}
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr class="text-center bg-info text-light">
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Number</th>
+                  <th>Balance</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="text-center" v-for="accounts in account">
+                  <td>{{accounts.id}}</td>
+                  <td>{{accounts.name}}</td>
+                  <td>{{accounts.number}}</td>
+                  <td>{{accounts.balance}}</td>
+                  <td>
+                    <a
+                      href="#"
+                      class="btn btn-warning"
+                      @click="showEditModal=true; selectAccount(accounts);"
+                    >
+                      Edit
+                    </a>
+                    <a
+                      href="#"
+                      class="btn btn-danger"
+                      @click="showDeleteModal=true; selectAccount(accounts);"
+                    >
+                      Delete
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div v-else-if="menuActive == 'paymentPage'" class="container">
+        <div class="row mt-3">
+          <div class="col-lg-6">
+            <h3 class="text-info">Payment</h3>
+          </div>
+          <div class="col-lg-6">
+            <button
+              class="btn btn-info"
+              style="float: right"
+              @click="showAddModalPayment=true"
+            >
+              Add New Payment
+            </button>
+          </div>
+        </div>
+        <hr class="bg-info" />
+        <div class="alert alert-danger" v-if="errorMsg">{{ errorMsg }}</div>
+        <div class="alert alert-success" v-if="successMsg">
+          {{ successMsg }}
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr class="text-center bg-info text-light">
+                  <th>ID</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Type</th>
+                  <th>Remitter Account</th>
+                  <th>Beneficiary Account</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="text-center" v-for="Payments in Payment">
+                  <td>{{Payments.id}}</td>
+                  <td>{{Payments.description}}</td>
+                  <td>{{Payments.amount}}</td>
+                  <td>{{Payments.type_key}}</td>
+                  <td>{{Payments.remitter_account_id}}</td>
+                  <td>{{Payments.beneficiary_account_id}}</td>
+                  <td>
+                    <a
+                      href="#"
+                      class="btn btn-warning"
+                      @click="showEditModalPayment=true; selectPayment(Payments);"
+                    >
+                      Edit
+                    </a>
+                    <a
+                      href="#"
+                      class="btn btn-danger"
+                      @click="showDeleteModalPayment    =true; selectPayment(Payments);"
+                    >
+                      Delete
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div v-else-if="menuActive == 'transactionPage'" class="container">
+        <div class="row mt-3">
+          <div class="col-lg-6">
+            <h3 class="text-info">Transaction</h3>
+          </div>
+          <div class="col-lg-6">
+            <input type="text" v-model="keyword" />
+            <input type="button" @click="search(true)" value="Search Button" class="btn btn-primary" />
+          </div>
+        </div>
+        <hr class="bg-info" />
+        <div class="alert alert-danger" v-if="errorMsg">{{ errorMsg }}</div>
+        <div class="alert alert-success" v-if="successMsg">
+          {{ successMsg }}
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr class="text-center bg-info text-light">
+                  <th>Transaction_ID</th>
+                  <th>Company_id</th>
+                  <th>Description</th>
+                  <th>Purpose</th>
+                  <th>Merchant_id</th>
+                  <th>Amount</th>
+                  <th>Created_at</th>
+                  <th>Created_by</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  class="text-center"
+                  v-for="(item,index) in transaction"
+                  :key="item.Transaction_ID"
+                >
+                  <td>{{item.Transaction_ID}}</td>
+                  <td>{{item.Company_id}}</td>
+                  <td>{{item.Description}}</td>
+                  <td>{{item.Purpose}}</td>
+                  <td>{{item.Merchant_id}}</td>
+                  <td>{{item.Amount}}</td>
+                  <td>{{item.Created_at}}</td>
+                  <td>{{item.Created_by}}</td>
+                  <td>
+                    <!-- <a
+                      href="#"
+                      class="btn btn-warning"
+                      @click="showEditModalPayment=true; selectPayment(Payments);"
+                    >
+                      Edit
+                    </a>
+                    <a
+                      href="#"
+                      class="btn btn-danger"
+                      @click="showDeleteModalPayment    =true; selectPayment(Payments);"
+                    >
+                      Delete
+                    </a> -->
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div>
+              <span @click="prevPage"> << </span>
+              <span>{{' '+pageActive+' '}}</span>
+              <span @click="nextPage"> >> </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Add modal -->
+      <div id="overlay" v-if="showAddModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="model-header">
+              <h5
+                class="modal-title"
+                style="padding-left: 10px; padding-right: 10px"
+              >
+                Add New Account
+                <button type="button" class="close" @click="showAddModal=false">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </h5>
+            </div>
+            <div class="modal-body p-4">
+              <form action="#" method="post">
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="name"
+                    class="form-control form-control-lg"
+                    placeholder="Add Name"
+                    v-model="newAccount.name"
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="number"
+                    class="form-control form-control-lg"
+                    placeholder="Add Number"
+                    v-model="newAccount.number"
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="balance"
+                    class="form-control form-control-lg"
+                    placeholder="Add Balance"
+                    v-model="newAccount.balance"
+                  />
+                </div>
+                <div class="form-group">
+                  <button
+                    class="btn btn-info btn-block btn-lg"
+                    @click="showAddModal=false; addAccount();"
+                  >
+                    Add Account
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                updateAccount() {
-                    var formData = app.toFormData(app.currentAccount);
-                    axios.post("http://localhost/danabijak/be/Core.php?action=update", formData).then(function(response) {
-                        app.currentAccount = {};
-                        if(response.data.error){
-                            app.errorMsg = response.data.message;
-                        }
-                        else {
-                            app.successMsg = response.data.message;
-                            app.account = response.data.account;
-                            app.getAllAccount();
-                        }
-                    })
-                },
+      <!-- Edit modal -->
+      <div id="overlay" v-if="showEditModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="model-header">
+              <h5
+                class="modal-title"
+                style="padding-left: 10px; padding-right: 10px"
+              >
+                Edit Account
+                <button
+                  type="button"
+                  class="close"
+                  @click="showEditModal=false"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </h5>
+            </div>
+            <div class="modal-body p-4">
+              <form action="#" method="post">
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="name"
+                    class="form-control form-control-lg"
+                    placeholder="Add Name"
+                    v-model="currentAccount.name"
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="number"
+                    class="form-control form-control-lg"
+                    placeholder="Add Number"
+                    v-model="currentAccount.number"
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="balance"
+                    class="form-control form-control-lg"
+                    placeholder="Add Balance"
+                    v-model="currentAccount.balance"
+                  />
+                </div>
+                <div class="form-group">
+                  <button
+                    class="btn btn-info btn-block btn-lg"
+                    @click="showEditModal=false; updateAccount();"
+                  >
+                    Update Account
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                deleteAccount() {
-                    var formData = app.toFormData(app.currentAccount);
-                    axios.post("http://localhost/danabijak/be/Core.php?action=delete", formData).then(function(response) {
-                        app.currentAccount = {};
-                        if(response.data.error){
-                            app.errorMsg = response.data.message;
-                        }
-                        else {
-                            app.successMsg = response.data.message;
-                            app.account = response.data.account;
-                            app.getAllAccount();
-                        }
-                    })
-                },
-                toFormData(obj) {
-                    var fd = new FormData();
-                    for( var i in obj) {
-                        fd.append(i, obj[i]);
-                    }
-                    return fd;
-                },
-                selectAccount(account){
-                    app.currentAccount = account;
-                },
-                clearMsg() {
-                    app.errorMsg = "";
-                    app.successMsg = "";
-                }
+      <!-- Delete modal -->
+      <div id="overlay" v-if="showDeleteModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="model-header">
+              <h5
+                class="modal-title"
+                style="padding-left: 10px; padding-right: 10px"
+              >
+                Delete Account
+                <button
+                  type="button"
+                  class="close"
+                  @click="showDeleteModal=false"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </h5>
+            </div>
+            <div class="modal-body p-4">
+              <h4>Are you sure want to delete data?</h4>
+              <h5>You are deleting '{{ currentAccount.name }}'</h5>
+              <hr />
+              <button
+                class="btn btn-danger btn-lg"
+                @click="showDeleteModal=false; deleteAccount(); clearMsg();"
+              >
+                Yes
+              </button>
+              <button
+                class="btn btn-success btn-lg"
+                @click="showDeleteModal=false"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add modal -->
+      <div id="overlay" v-if="showAddModalPayment">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="model-header">
+              <h5
+                class="modal-title"
+                style="padding-left: 10px; padding-right: 10px"
+              >
+                Add New Payment
+                <button
+                  type="button"
+                  class="close"
+                  @click="showAddModalPayment=false"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </h5>
+            </div>
+            <div class="modal-body p-4">
+              <form action="#" method="post">
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="name"
+                    class="form-control form-control-lg"
+                    placeholder="Add Description"
+                    v-model="newPayment.description"
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="number"
+                    class="form-control form-control-lg"
+                    placeholder="Add Amount"
+                    v-model="newPayment.amount"
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="balance"
+                    class="form-control form-control-lg"
+                    placeholder="Add Type"
+                    v-model="newPayment.type_key"
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="number"
+                    class="form-control form-control-lg"
+                    placeholder="Add Remitter Account"
+                    v-model="newPayment.remitter_account_id"
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="balance"
+                    class="form-control form-control-lg"
+                    placeholder="Add Beneficiary Account"
+                    v-model="newPayment.beneficiary_account_id"
+                  />
+                </div>
+                <div class="form-group">
+                  <button
+                    class="btn btn-info btn-block btn-lg"
+                    @click="showAddModalPayment=false; addPayment();"
+                  >
+                    Add Payment
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit modal -->
+      <div id="overlay" v-if="showEditModalPayment">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="model-header">
+              <h5
+                class="modal-title"
+                style="padding-left: 10px; padding-right: 10px"
+              >
+                Edit Payment
+                <button
+                  type="button"
+                  class="close"
+                  @click="showEditModalPayment=false"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </h5>
+            </div>
+            <div class="modal-body p-4">
+              <form action="#" method="post">
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="name"
+                    class="form-control form-control-lg"
+                    placeholder="Add Description"
+                    v-model="currentPayment.description"
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="number"
+                    class="form-control form-control-lg"
+                    placeholder="Add Amount"
+                    v-model="currentPayment.amount"
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="balance"
+                    class="form-control form-control-lg"
+                    placeholder="Add Type"
+                    v-model="currentPayment.type_key"
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="number"
+                    class="form-control form-control-lg"
+                    placeholder="Add Remitter Account"
+                    v-model="currentPayment.remitter_account_id"
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    name="balance"
+                    class="form-control form-control-lg"
+                    placeholder="Add Beneficiary Account"
+                    v-model="currentPayment.beneficiary_account_id"
+                  />
+                </div>
+                <div class="form-group">
+                  <button
+                    class="btn btn-info btn-block btn-lg"
+                    @click="showEditModalPayment=false; updatePayment();"
+                  >
+                    Update Payment
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delete modal -->
+      <div id="overlay" v-if="showDeleteModalPayment">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="model-header">
+              <h5
+                class="modal-title"
+                style="padding-left: 10px; padding-right: 10px"
+              >
+                Delete Payment
+                <button
+                  type="button"
+                  class="close"
+                  @click="showDeleteModalPayment=false"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </h5>
+            </div>
+            <div class="modal-body p-4">
+              <h4>Are you sure want to delete data?</h4>
+              <h5>You are deleting '{{ currentPayment.id }}'</h5>
+              <hr />
+              <button
+                class="btn btn-danger btn-lg"
+                @click="showDeleteModalPayment=false; deletePayment(); clearMsg();"
+              >
+                Yes
+              </button>
+              <button
+                class="btn btn-success btn-lg"
+                @click="showDeleteModalPayment=false"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.3/axios.min.js"></script>
+    <script>
+      var app = new Vue({
+        el: "#app",
+        data: {
+          menuActive: "accountPage",
+          errorMsg: "",
+          successMsg: "",
+          isSearchActive: false,
+          keyword: "",
+          showAddModal: false,
+          showEditModal: false,
+          showDeleteModal: false,
+          account: [],
+          pageActive: 1,
+          newAccount: { name: "", number: "", balance: "" },
+          searchParam: { keyword: "" },
+          currentAccount: {},
+          showAddModalPayment: false,
+          showEditModalPayment: false,
+          showDeleteModalPayment: false,
+          Payment: [],
+          transaction: [],
+          newPayment: {
+            description: "",
+            amount: "",
+            type_key: "",
+            remitter_account_id: "",
+            beneficiary_account_id: "",
+          },
+          currentPayment: {},
+        },
+        watch: {
+          pageActive(newVal, oldVal) {
+            if (this.isSearchActive) {
+              this.search();
+            } else {
+              this.getAllTransaction();
             }
-        });
-        </script>
-    </body>
+          },
+          menuActive(newVal) {
+            if (newVal == "accountPage") {
+              this.getAllAccount();
+            } else if (newVal == "paymentPage") {
+              this.getAllPayment();
+            } else if (newVal == "transactionPage") {
+              this.getAllTransaction();
+            }
+            this.isSearchActive = false;
+          },
+        },
+        mounted: function () {
+          this.getAllAccount();
+        },
+        methods: {
+          prevPage() {
+            if (this.pageActive == 1) {
+              alert("page terakhir");
+            } else {
+              this.pageActive = this.pageActive - 1;
+            }
+          },
+          nextPage() {
+            // if (this.pageActive == 1) {
+            //   alert("page terakhir");
+            // } else {
+            this.pageActive = this.pageActive + 1;
+            // }
+          },
+          getAllAccount() {
+            axios
+              .get("http://localhost/danabijak/BE/Core.php?action=read")
+              .then(function (response) {
+                if (response.data.error) {
+                  app.errorMsg = response.data.message;
+                } else {
+                  //app.successMsg = response.data.message;
+                  app.account = response.data.account;
+                }
+              });
+          },
+          getAllTransaction() {
+            axios
+              .get(
+                "http://localhost/danabijak/BE/Transaction.php?action=read&page=" +
+                  this.pageActive
+              )
+              .then(function (response) {
+                if (response.data.error) {
+                  app.errorMsg = response.data.message;
+                } else {
+                  //app.successMsg = response.data.message;
+                  app.transaction = response.data.DATA;
+                }
+              });
+          },
+          search(isFirstTime) {
+            if (isFirstTime) {
+              this.isSearchActive = true;
+              this.pageActive = 1;
+            }
+            var formData = app.toFormData({ name: this.keyword });
+            axios
+              .post(
+                "http://localhost/danabijak/BE/Transaction.php?action=search&page=" +
+                  this.pageActive,
+                formData
+              )
+              .then(function (response) {
+                // app.newAccount = { name: "", number: "", balance: "" };
+                if (response.data.error) {
+                  app.errorMsg = response.data.message;
+                } else {
+                  app.transaction = response.data.DATA;
+                }
+              });
+          },
+          addAccount() {
+            var formData = app.toFormData(app.newAccount);
+            axios
+              .post(
+                "http://localhost/danabijak/BE/Core.php?action=create",
+                formData
+              )
+              .then(function (response) {
+                app.newAccount = { name: "", number: "", balance: "" };
+                if (response.data.error) {
+                  app.errorMsg = response.data.message;
+                } else {
+                  app.successMsg = response.data.message;
+                  app.account = response.data.account;
+                  app.getAllAccount();
+                }
+              });
+          },
+
+          updateAccount() {
+            var formData = app.toFormData(app.currentAccount);
+            axios
+              .post(
+                "http://localhost/danabijak/BE/Core.php?action=update",
+                formData
+              )
+              .then(function (response) {
+                app.currentAccount = {};
+                if (response.data.error) {
+                  app.errorMsg = response.data.message;
+                } else {
+                  app.successMsg = response.data.message;
+                  app.account = response.data.account;
+                  app.getAllAccount();
+                }
+              });
+          },
+
+          deleteAccount() {
+            var formData = app.toFormData(app.currentAccount);
+            axios
+              .post(
+                "http://localhost/danabijak/BE/Core.php?action=delete",
+                formData
+              )
+              .then(function (response) {
+                app.currentAccount = {};
+                if (response.data.error) {
+                  app.errorMsg = response.data.message;
+                } else {
+                  app.successMsg = response.data.message;
+                  app.account = response.data.account;
+                  app.getAllAccount();
+                }
+              });
+          },
+          toFormData(obj) {
+            var fd = new FormData();
+            for (var i in obj) {
+              fd.append(i, obj[i]);
+            }
+            return fd;
+          },
+          selectAccount(account) {
+            app.currentAccount = account;
+          },
+          clearMsg() {
+            app.errorMsg = "";
+            app.successMsg = "";
+          },
+          getAllPayment() {
+            axios
+              .get("http://localhost/danabijak/BE/Payment.php?action=read")
+              .then(function (response) {
+                if (response.data.error) {
+                  app.errorMsg = response.data.message;
+                } else {
+                  //app.successMsg = response.data.message;
+                  app.Payment = response.data.payment;
+                }
+              });
+          },
+          addPayment() {
+            var formData = app.toFormData(app.newPayment);
+            axios
+              .post(
+                "http://localhost/danabijak/BE/Payment.php?action=create",
+                formData
+              )
+              .then(function (response) {
+                app.newPayment = { name: "", number: "", balance: "" };
+                if (response.data.error) {
+                  app.errorMsg = response.data.message;
+                } else {
+                  app.successMsg = response.data.message;
+                  app.Payment = response.data.payment;
+                  app.getAllPayment();
+                }
+              });
+          },
+
+          updatePayment() {
+            var formData = app.toFormData(app.currentPayment);
+            axios
+              .post(
+                "http://localhost/danabijak/BE/Payment.php?action=update",
+                formData
+              )
+              .then(function (response) {
+                app.currentPayment = {};
+                if (response.data.error) {
+                  app.errorMsg = response.data.message;
+                } else {
+                  app.successMsg = response.data.message;
+                  app.Payment = response.data.payment;
+                  app.getAllPayment();
+                }
+              });
+          },
+
+          deletePayment() {
+            var formData = app.toFormData(app.currentPayment);
+            axios
+              .post(
+                "http://localhost/danabijak/BE/Payment.php?action=delete",
+                formData
+              )
+              .then(function (response) {
+                app.currentPayment = {};
+                if (response.data.error) {
+                  app.errorMsg = response.data.message;
+                } else {
+                  app.successMsg = response.data.message;
+                  app.Payment = response.data.payment;
+                  app.getAllPayment();
+                }
+              });
+          },
+          selectPayment(Payment) {
+            app.currentPayment = Payment;
+          },
+        },
+      });
+    </script>
+  </body>
 </html>
